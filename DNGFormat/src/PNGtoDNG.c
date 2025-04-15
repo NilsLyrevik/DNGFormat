@@ -21,6 +21,16 @@ int run(const char * restrict input, const char * restrict output_dir){
     if(img == NULL){
       return -1; // THIS MEANS ERROR WITH IMAGE
     }
+
+    // check if output_dir ends with a slash
+    if (output_dir[strlen(output_dir) - 1] != '/') {
+        // add a slash
+        snprintf(output_path, sizeof(output_path), "%s/", output_dir);
+    } else {
+        // no need to add a slash
+        snprintf(output_path, sizeof(output_path), "%s", output_dir);
+    }
+
     // create final path with filename
     snprintf(output_path, sizeof(output_path), "%soutput.dng", output_dir);
 
