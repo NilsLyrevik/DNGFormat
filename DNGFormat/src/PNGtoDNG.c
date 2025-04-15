@@ -19,7 +19,7 @@ int run(const char * restrict input, const char * restrict output_dir){
   
     // ERROR HANDLING, we should never reach here
     if(img == NULL){
-      return -1;
+      return -1; // THIS MEANS ERROR WITH IMAGE
     }
     // create final path with filename
     snprintf(output_path, sizeof(output_path), "%soutput.dng", output_dir);
@@ -28,10 +28,50 @@ int run(const char * restrict input, const char * restrict output_dir){
     FILE *file = fopen(output_path, "w");
     if (file == NULL) {
         perror("Error opening file");
-        return 1;
+        return 1; // THIS MEANS ERROR WITH CREATING FILE
     }
 
-    const short *DNGdata = malloc(sizeof(unsigned short) * width * height * channels + (sizeof(size_t) * 4));
+
+    uint16_t *DNGdata = malloc(sizeof(unsigned short) * width * height * channels + (sizeof(size_t) * 4));
+    if (DNGdata == NULL) {
+        perror("Error allocating memory");
+        fclose(file);
+        return 2; // THIS MEANS ERROR WITH MEMORY
+    }      
+
+    size_t filelen = fwrite(DNGdata, sizeof(unsigned short), width * height * channels + (sizeof(size_t) * 4), file);
+
+    // LOGIC FOR DNG HEADER
+      // This header was specifically designed to not make sense when reading it.
+    // NAMING CONVENTION
+    DNGdata[0] = 0b1000100 << 8 | 0b1110101;
+    DNGdata[1] = 0b1101101 << 8 | 0b1100010; 
+    DNGdata[2] = 0b1001110 << 8 | 0b1000111; 
+    DNGdata[3] = 0b1001001 << 8 | 0b1000111; 
+    // WIDTH
+    DNGdata[4] = width >> 8;
+    DNGdata[5] = width;
+    DNGdata[6] = 0;
+    DNGdata[7] = 0;
+    //HEIGHT
+    DNGdata[8] = height >> 8;
+    DNGdata[9] = height;
+    DNGdata[10] = 0;
+    DNGdata[11] = 0;
+    //CHANNELS
+    DNGdata[12] = channels;
+    DNGdata[13] = 0;
+    DNGdata[14] = 0;
+    DNGdata[15] = 0;
+    // LOGIC FOR HEADER DONE
+
+
+  
+
+    fclose(file);
+    free(DNGdata);
+    stbi_image_free(img);
+    return 0; // THIS MEANS CORRECT EXECUTION
 
 
 
