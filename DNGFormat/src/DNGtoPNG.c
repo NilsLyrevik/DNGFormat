@@ -7,6 +7,6 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../libs/stb_image/stb_image_write.h"
 
-int run(const char *input, const char *o_dir){
+int run(const char * restrict input, const char * restrict output_dir){
     
 }
