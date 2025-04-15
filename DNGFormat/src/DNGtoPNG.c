@@ -34,16 +34,33 @@ int run(const char * restrict DNGfile, const char * restrict output_dir){
         return 1; // THIS MEANS ERROR WITH OPENING FILE
     }
 
+    unsigned int width, height, channels;
+    fseek(dng_file, 8, SEEK_SET);
+    
+    fread(&width, sizeof(int), 1, dng_file);
+    
+    fseek(dng_file, 4, SEEK_CUR);
+    
+    fread(&height, sizeof(int), 1, dng_file);
+    
+    fseek(dng_file, 4, SEEK_CUR);
+    
+    fread(&channels, sizeof(uint16_t), 1, dng_file);
+    
+    fseek(dng_file, 6, SEEK_CUR); // Skip extra bytes if necessary
+    
+    printf("Width: %u, Height: %u, Channels: %u\n", width, height, channels);
 
-    int width, height, channels;
-    fread(&width, sizeof(uint32_t), 1, file);
 
-
+    
     unsigned char *img = malloc(sizeof(unsigned char) * width * height * channels);
 
     for (int i = 0; i < width * height * channels; i++) {
-        img[i] = (unsigned char)DNGdata[i + 16];
+        fread(&img[i], sizeof(unsigned char), 1, dng_file);
+        fseek(dng_file, 1, SEEK_CUR);
     }
+
+    fclose(dng_file);
 
     // Save the image using stb_image_write
     if (stbi_write_png(output_path, width, height, channels, img, width * channels) == 0) {
@@ -51,4 +68,24 @@ int run(const char * restrict DNGfile, const char * restrict output_dir){
         free(img);
         return 1; // THIS MEANS ERROR WITH CREATING FILE
     }
+    
+
+    // Free the image memory
+    free(img);
+    return 0; // SUCCESS
+}
+
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <DNG file> <output directory>\n", argv[0]);
+        return 1;
+    }
+
+    int result = run(argv[1], argv[2]);
+    if (result != 0) {
+        fprintf(stderr, "Error: %d\n", result);
+        return result;
+    }
+
+    return 0; // SUCCESS
 }

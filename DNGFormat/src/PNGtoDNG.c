@@ -1,3 +1,4 @@
+#include <stdint.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -17,6 +18,7 @@ int run(const char * restrict input, const char * restrict output_dir){
     int width,height,channels;
     unsigned char *img = stbi_load(input, &width, &height, &channels, 0);
   
+    printf("Width: %d, Height: %d, Channels: %d\n", width, height, channels);
     // ERROR HANDLING, we should never reach here
     if(img == NULL){
       return -1; // THIS MEANS ERROR WITH IMAGE
@@ -57,13 +59,13 @@ int run(const char * restrict input, const char * restrict output_dir){
     DNGdata[2] = 0b1000111 << 8 | 0b1001110; 
     DNGdata[3] = 0b1000111 << 8 | 0b1001001;
     // WIDTH
-    DNGdata[4] = width >> 8;
-    DNGdata[5] = width;
+    DNGdata[4] = (uint16_t)(width & 0xFFFF);
+    DNGdata[5] = (uint16_t)((width >> 16) & 0xFFFF);
     DNGdata[6] = 0;
     DNGdata[7] = 0;
     //HEIGHT
-    DNGdata[8] = height >> 8;
-    DNGdata[9] = height;
+    DNGdata[8] = (uint16_t)(height & 0xFFFF);
+    DNGdata[9] = (uint16_t)((height >> 16)& 0xFFFF);
     DNGdata[10] = 0;
     DNGdata[11] = 0;
     //CHANNELS
