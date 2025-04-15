@@ -7,9 +7,9 @@ filename = input()
 # Filename Logic
 
 if filename.endswith(".dng"):
-    runC = ctypes.CDLL("./lib/DNGtoPNG.so")
+    runC = ctypes.CDLL("../libs/DNGtoPNG.so")
 elif filename.endswith(".png"):
-    runC = ctypes.CDLL("./lib/PNGtoDNG.so")
+    runC = ctypes.CDLL("../libs/PNGtoDNG.so")
 else:
     print("Invalid file type. Please provide a .dng or .png file.")
     exit(1)

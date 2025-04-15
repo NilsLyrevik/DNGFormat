@@ -39,15 +39,13 @@ int run(const char * restrict input, const char * restrict output_dir){
         return 2; // THIS MEANS ERROR WITH MEMORY
     }      
 
-    size_t filelen = fwrite(DNGdata, sizeof(unsigned short), width * height * channels + (sizeof(size_t) * 4), file);
-
     // LOGIC FOR DNG HEADER
-      // This header was specifically designed to not make sense when reading it.
+    // ----> This header was specifically designed to not make sense when reading it.
     // NAMING CONVENTION
-    DNGdata[0] = 0b1000100 << 8 | 0b1110101;
-    DNGdata[1] = 0b1101101 << 8 | 0b1100010; 
-    DNGdata[2] = 0b1001110 << 8 | 0b1000111; 
-    DNGdata[3] = 0b1001001 << 8 | 0b1000111; 
+    DNGdata[0] = 0b1110101 << 8 | 0b1000100;
+    DNGdata[1] = 0b1100010 << 8 | 0b1101101; 
+    DNGdata[2] = 0b1000111 << 8 | 0b1001110; 
+    DNGdata[3] = 0b1000111 << 8 | 0b1001001;
     // WIDTH
     DNGdata[4] = width >> 8;
     DNGdata[5] = width;
@@ -64,15 +62,34 @@ int run(const char * restrict input, const char * restrict output_dir){
     DNGdata[14] = 0;
     DNGdata[15] = 0;
     // LOGIC FOR HEADER DONE
+    for (int i = 16; i < width * height * channels; i++){
+        DNGdata[i] = img[i] << 8 | img[i];
+    }
 
-
+    size_t filelen = fwrite(DNGdata, sizeof(unsigned short), width * height * channels + (sizeof(size_t) * 4), file);
   
 
     fclose(file);
     free(DNGdata);
     stbi_image_free(img);
     return 0; // THIS MEANS CORRECT EXECUTION
+}
 
+int main (int argc, char *argv[]) {
+    if (argc != 3) {
+        fprintf(stderr, "Usage: %s <input_image> <output_directory>\n", argv[0]);
+        return 1;
+    }
 
+    const char *input = argv[1];
+    const char *output_dir = argv[2];
 
+    int result = run(input, output_dir);
+    if (result != 0) {
+        fprintf(stderr, "Error occurred: %d\n", result);
+        return result;
+    }
+
+    printf("DNG file created successfully.\n");
+    return 0;
 }
