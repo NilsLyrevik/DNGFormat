@@ -7,6 +7,48 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../libs/stb_image/stb_image_write.h"
 
-int run(const char * restrict input, const char * restrict output_dir){
-    
+int run(const char * restrict DNGfile, const char * restrict output_dir){
+    // check if output_dir ends with a slash
+    char output_path[512];
+    if (output_dir[strlen(output_dir) - 1] != '/') {
+        // add a slash
+        snprintf(output_path, sizeof(output_path), "%s/", output_dir);
+    } else {
+        // no need to add a slash
+        snprintf(output_path, sizeof(output_path), "%s", output_dir);
+    }
+    // create final path with filename
+    snprintf(output_path, sizeof(output_path), "%soutput.png", output_dir);
+
+    // File opening with error handling
+    FILE *file = fopen(output_path, "r");
+    if (file != NULL) {
+        fclose(file);
+        fprintf(stderr, "File already exists. Please choose a different name.\n");
+        return 7; // THIS MEANS ERROR WITH OPENING FILE
+    }
+    // load DNGfile
+    FILE *dng_file = fopen(DNGfile, "rb");
+    if (dng_file == NULL) {
+        perror("Error opening DNG file");
+        return 1; // THIS MEANS ERROR WITH OPENING FILE
+    }
+
+
+    int width, height, channels;
+    fread(&width, sizeof(uint32_t), 1, file);
+
+
+    unsigned char *img = malloc(sizeof(unsigned char) * width * height * channels);
+
+    for (int i = 0; i < width * height * channels; i++) {
+        img[i] = (unsigned char)DNGdata[i + 16];
+    }
+
+    // Save the image using stb_image_write
+    if (stbi_write_png(output_path, width, height, channels, img, width * channels) == 0) {
+        fprintf(stderr, "Error writing PNG file\n");
+        free(img);
+        return 1; // THIS MEANS ERROR WITH CREATING FILE
+    }
 }
