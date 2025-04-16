@@ -24,12 +24,10 @@ int run(const char * restrict input, const char * restrict output_dir){
       return -1; // THIS MEANS ERROR WITH IMAGE
     }
 
-    // check if output_dir ends with a slash
+    // dont think this works?
     if (output_dir[strlen(output_dir) - 1] != '/') {
-        // add a slash
         snprintf(output_path, sizeof(output_path), "%s/", output_dir);
     } else {
-        // no need to add a slash
         snprintf(output_path, sizeof(output_path), "%s", output_dir);
     }
 
