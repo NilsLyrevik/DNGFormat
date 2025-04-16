@@ -86,22 +86,3 @@ int run(const char * restrict input, const char * restrict output_dir){
     stbi_image_free(img);
     return 0; // THIS MEANS CORRECT EXECUTION
 }
-
-int main (int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <input_image> <output_directory>\n", argv[0]);
-        return 1;
-    }
-
-    const char *input = argv[1];
-    const char *output_dir = argv[2];
-
-    int result = run(input, output_dir);
-    if (result != 0) {
-        fprintf(stderr, "Error occurred: %d\n", result);
-        return result;
-    }
-
-    printf("DNG file created successfully.\n");
-    return 0;
-}

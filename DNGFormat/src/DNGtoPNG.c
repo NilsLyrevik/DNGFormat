@@ -74,18 +74,3 @@ int run(const char * restrict DNGfile, const char * restrict output_dir){
     free(img);
     return 0; // SUCCESS
 }
-
-int main(int argc, char *argv[]) {
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <DNG file> <output directory>\n", argv[0]);
-        return 1;
-    }
-
-    int result = run(argv[1], argv[2]);
-    if (result != 0) {
-        fprintf(stderr, "Error: %d\n", result);
-        return result;
-    }
-
-    return 0; // SUCCESS
-}

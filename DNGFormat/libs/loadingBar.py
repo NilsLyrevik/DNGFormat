@@ -8,4 +8,3 @@ def loading_bar(duration=1.0, bar_length=30):
         sys.stdout.write("█")
         sys.stdout.flush()
     print(" Done!")
-loading_bar()
